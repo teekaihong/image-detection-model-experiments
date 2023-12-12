@@ -1,0 +1,14 @@
+torch
+torchvision
+pandas
+notebook
+matplotlib
+tqdm
+statsmodels
+patsy
+diffusers
+accelerate
+boto3
+umap-learn
+scikit-learn
+python-dotenv
