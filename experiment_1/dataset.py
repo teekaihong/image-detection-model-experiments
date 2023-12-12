@@ -5,7 +5,7 @@ from torchvision.io import read_image
 
 
 default_resizer = transforms.Compose([
-    transforms.Resize((192,240), antialias=True)
+    transforms.Resize((192,240), antialias=True),
 ])
 
 class AEDataset(Dataset):

@@ -99,8 +99,8 @@ class VariationalEncoder(nn.Module):
         super().__init__()
         self.latent_channels = latent_dims
         self.down1 = DownsampleBlock(3, 64, 4, dropout=dropout)
-        self.down2 = DownsampleBlock(64, 256, 16, dropout=dropout)
-        self.down3 = DownsampleBlock(256, self.latent_channels, 1, dropout=dropout)
+        self.down2 = DownsampleBlock(64, 128, 8, dropout=dropout)
+        self.down3 = DownsampleBlock(128, self.latent_channels, 1, dropout=dropout)
         
         self.mean = ResidualBlock(self.latent_channels, self.latent_channels, 1, dropout=dropout)
         self.logvar = ResidualBlock(self.latent_channels, self.latent_channels, 1, dropout=dropout)
@@ -117,23 +117,23 @@ class VariationalDecoder(nn.Module):
     def __init__(self, dropout=0., latent_dims:int=latent_dims):
         super().__init__()
         self.latent_channels = latent_dims
-        self.res1 = ResidualBlock(self.latent_channels, 768, 48, dropout=dropout)
-        self.up1 = UpsampleBlock(768, 768, 48, dropout=dropout)
-        self.res2 = ResidualBlock(768, 512, 32, dropout=dropout)
+        self.res = ResidualBlock(self.latent_channels, 1024, 8, dropout=dropout)
+        self.up1 = UpsampleBlock(1024, 512, 64, dropout=dropout)
+        self.res1 = ResidualBlock(512, 512, 32, dropout=dropout)
         self.up2 = UpsampleBlock(512, 512, 32, dropout=dropout)
-        self.res3 = ResidualBlock(512, 256, 16, dropout=dropout)
+        self.res2 = ResidualBlock(512, 256, 16, dropout=dropout)
         self.up3 = UpsampleBlock(256, 256, 16, dropout=dropout)
-        self.res4 = ResidualBlock(256, 128, 8, dropout=dropout)
+        self.res3 = ResidualBlock(256, 128, 8, dropout=dropout)
         self.out = ResidualBlock(128, 3, 1, dropout=dropout)
 
     def forward(self, x:torch.Tensor):
-        x = self.res1(x)
+        x = self.res(x)
         x = self.up1(x)
-        x = self.res2(x)
+        x = self.res1(x)
         x = self.up2(x)
-        x = self.res3(x)
+        x = self.res2(x)
         x = self.up3(x)
-        x = self.res4(x)
+        x = self.res3(x)
         x = self.out(x)
         return x
 
@@ -142,7 +142,7 @@ class StableDiffusionDecoder(nn.Module):
         super().__init__()
         vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse")
         sd_decoder = vae.decoder
-        layers_to_train = ['conv_in','conv_norm_out','conv_out']
+        layers_to_train = ['conv_in']
         for name, param in sd_decoder.named_parameters():
             if any([layer in name for layer in layers_to_train]):
                 param.requires_grad = True
