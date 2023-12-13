@@ -79,7 +79,7 @@ class MultiheadAttention(nn.Module):
     def __init__(self, in_channels, num_heads, dropout=0.):
         super().__init__()
         self.heads = nn.ModuleList([AttentionHead(in_channels, dropout) for _ in range(num_heads)])
-        self.conv = ResidualBlock(in_channels*num_heads, in_channels, 1)
+        self.conv = ResidualBlock(in_channels*num_heads, in_channels, num_heads, dropout=0.)
         self.nonlinearity = nn.SiLU()
         self.dropout = nn.Dropout(dropout)
 
@@ -98,21 +98,19 @@ class VariationalEncoder(nn.Module):
     def __init__(self, dropout=0., latent_dims:int=latent_dims):
         super().__init__()
         self.latent_channels = latent_dims
-        self.down1 = DownsampleBlock(3, 128, 8, dropout=dropout)
-        self.res1 = ResidualBlock(128, 128, 8, dropout=dropout)
-        self.down2 = DownsampleBlock(128, 256, 16, dropout=dropout)
-        self.res2 = ResidualBlock(256, 512, 32, dropout=dropout)
-        self.down3 = DownsampleBlock(512, self.latent_channels, 1, dropout=dropout)
+        self.down1 = DownsampleBlock(3, 32, 2, dropout=dropout)
+        self.down2 = DownsampleBlock(32, 48, 4, dropout=dropout)
+        self.down3 = DownsampleBlock(48, 96, 6, dropout=dropout)
+        self.attn3 = MultiheadAttention(96, num_heads=16, dropout=dropout)
         
-        self.mean = ResidualBlock(self.latent_channels, self.latent_channels, 1, dropout=dropout)
-        self.logvar = ResidualBlock(self.latent_channels, self.latent_channels, 1, dropout=dropout)
+        self.mean = ResidualBlock(96, self.latent_channels, 1, dropout=dropout)
+        self.logvar = ResidualBlock(96, self.latent_channels, 1, dropout=dropout)
 
     def forward(self, x:torch.Tensor):
         x = self.down1(x)
-        x = self.res1(x)
         x = self.down2(x)
-        x = self.res2(x)
         x = self.down3(x)
+        x = self.attn3(x)
         mean = self.mean(x)
         logvar = self.logvar(x)
         return mean, logvar
