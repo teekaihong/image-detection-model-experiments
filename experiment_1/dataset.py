@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import Dataset
-from torchvision.transforms import v2 as transforms
+from torchvision import transforms
 from torchvision.io import read_image
 
 
