@@ -1,3 +1,3 @@
-# Experiment 1: Compressed image representations
+# Experiment 1: Masked Variational Autoencoder
 
-This experiment implements a simple autoencoder to compress images. We mainly evaluate the reconstruction to see if the autoencoder learns to compress the images in a meaningful way.
+This experiment implements a variational autoencoder with input masking.

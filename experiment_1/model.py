@@ -99,7 +99,7 @@ class VariationalEncoder(nn.Module):
         super().__init__()
         self.latent_channels = latent_dims
         self.down1 = DownsampleBlock(3, 32, 2, dropout=dropout)
-        self.down2 = DownsampleBlock(32, 48, 4, dropout=dropout)
+        self.down2 = DownsampleBlock(32, 48, 3, dropout=dropout)
         self.down3 = DownsampleBlock(48, 96, 6, dropout=dropout)
         self.attn3 = MultiheadAttention(96, num_heads=16, dropout=dropout)
         
@@ -144,12 +144,12 @@ class StableDiffusionDecoder(nn.Module):
         super().__init__()
         vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse")
         sd_decoder = vae.decoder
-        layers_to_train = ['conv_in']
-        for name, param in sd_decoder.named_parameters():
-            if any([layer in name for layer in layers_to_train]):
-                param.requires_grad = True
-            else:
-                param.requires_grad = False
+        # layers_to_train = ['conv_in']
+        # for name, param in sd_decoder.named_parameters():
+        #     if any([layer in name for layer in layers_to_train]):
+        #         param.requires_grad = True
+        #     else:
+        #         param.requires_grad = False
         self.decoder = sd_decoder
     
     def forward(self, x:torch.Tensor):
