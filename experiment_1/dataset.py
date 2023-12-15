@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.io import read_image
+import pandas as pd
 
 
 default_resizer = transforms.Compose([
@@ -10,6 +11,8 @@ default_resizer = transforms.Compose([
 
 class AEDataset(Dataset):
     def __init__(self, filepaths, resize = default_resizer, transform=None):
+        if isinstance(filepaths, pd.Series):
+            filepaths = filepaths.tolist()
         self.filepaths = filepaths
         self.transform = transform
         self.resize = resize
