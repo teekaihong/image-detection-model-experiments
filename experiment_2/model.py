@@ -191,15 +191,14 @@ class LatentResizer(nn.Module):
 
 class DetectorHead(nn.Module):
     def __init__(self, num_classes:int, latent_channels:int) -> None:
-        # predicts class, objectness, and one bounding box
+        # predicts class and one bounding box
         super().__init__()
-        self.resize_latent = LatentResizer()
-        self.input_dims = self.resize_latent.latent_dims
+        self.down1 = DownsampleBlock(latent_channels, latent_channels*2, 2)
         self.flatten = nn.Flatten()
-        self.linear = nn.Linear(self.input_dims[0]*self.input_dims[1]*latent_channels, num_classes + 5)
+        self.linear = nn.Linear(latent_channels*2*12*15, num_classes + 4)
     
     def forward(self, x:torch.Tensor):
-        x = self.resize_latent(x)
+        x = self.down1(x)
         x = self.flatten(x)
         x = self.linear(x)
         return x
