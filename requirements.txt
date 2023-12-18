@@ -12,3 +12,7 @@ boto3
 umap-learn
 scikit-learn
 python-dotenv
+opencv-python
+easydict
+kornia
+timm
