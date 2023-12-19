@@ -1,0 +1,3 @@
+# Experiment 2: Single object detection on Masked AE pretrained backbone
+
+This experiment is a single object detection experiment on the Masked AE pretrained backbone. The Masked AE pretrained backbone is trained on the dataset of implement images we have. This backbone is the encoder part of an autoencoder trained to reconstruct salient objects found in PTO cameras. Salient objects typically are implements, so the backbone should be able to featurize and locate implements in images.
