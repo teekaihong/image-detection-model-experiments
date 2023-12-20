@@ -209,7 +209,7 @@ class Detector(nn.Module):
         self.num_classes = num_classes
         self.encoder = VariationalEncoder(dropout)
         for p in self.encoder.parameters():
-            p.requires_grad = False
+            p.requires_grad = True
         self.head = DetectorHead(num_classes, self.encoder.latent_channels)
     
     def forward(self, x:torch.Tensor):
